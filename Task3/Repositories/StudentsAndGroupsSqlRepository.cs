@@ -10,17 +10,17 @@ namespace UniversitySql.Repositories
     {
         private readonly string _connectionString;
 
-        public StudentsAndGroupsSqlRepository(string connectionString)
+        public StudentsAndGroupsSqlRepository( string connectionString )
         {
             _connectionString = connectionString;
         }
 
-        public void AddStudentIntoGroup(int studentId, int groupId)
+        public void AddStudentIntoGroup( int studentId, int groupId )
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
-                using (SqlCommand сommand = connection.CreateCommand())
+                using ( SqlCommand сommand = connection.CreateCommand() )
                 {
                     сommand.CommandText =
                         @"insert into [StudentsAndGroups]
@@ -28,39 +28,39 @@ namespace UniversitySql.Repositories
                     values
                         (@studentId, @groupId)";
 
-                    сommand.Parameters.Add("@studentId", SqlDbType.NVarChar).Value = studentId;
-                    сommand.Parameters.Add("@groupId", SqlDbType.NVarChar).Value = groupId;
+                    сommand.Parameters.Add( "@studentId", SqlDbType.NVarChar ).Value = studentId;
+                    сommand.Parameters.Add( "@groupId", SqlDbType.NVarChar ).Value = groupId;
 
                     сommand.ExecuteNonQuery();
                 }
             }
         }
 
-        public List<Student> GetStudentsBuGroupId(int groupId)
+        public List<Student> GetStudentsBuGroupId( int groupId )
         {
             var result = new List<Student>();
 
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
-                using (SqlCommand сommand = connection.CreateCommand())
+                using ( SqlCommand сommand = connection.CreateCommand() )
                 {
                     сommand.CommandText =
                         @"select [FirstName], [LastName] from StudentsAndGroups as studentsAndGroups
                             join Student as s on s.Id = studentsAndGroups.StudentId
                             where studentsAndGroups.StudyGroupId = @groupId";
 
-                    сommand.Parameters.Add("@groupId", SqlDbType.NVarChar).Value = groupId;
+                    сommand.Parameters.Add( "@groupId", SqlDbType.NVarChar ).Value = groupId;
 
-                    using (SqlDataReader reader = сommand.ExecuteReader())
+                    using ( SqlDataReader reader = сommand.ExecuteReader() )
                     {
-                        while (reader.Read())
+                        while ( reader.Read() )
                         {
-                            result.Add(new Student()
+                            result.Add( new Student()
                             {
-                                FirstName = Convert.ToString(reader["FirstName"]),
-                                LastName = Convert.ToString(reader["LastName"])
-                            });
+                                FirstName = Convert.ToString( reader[ "FirstName" ] ),
+                                LastName = Convert.ToString( reader[ "LastName" ] )
+                            } );
                         }
                     }
                 }
@@ -68,23 +68,23 @@ namespace UniversitySql.Repositories
             return result;
         }
 
-        public int GetStudentsCountInGroup(int groupId)
+        public int GetStudentsCountInGroup( int groupId )
         {
             int res = 0;
 
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
-                using (SqlCommand сommand = connection.CreateCommand())
+                using ( SqlCommand сommand = connection.CreateCommand() )
                 {
                     сommand.CommandText =
                         @"select count(*) from StudentsAndGroups as studentsAndGroups
                             join Student as s on s.Id = studentsAndGroups.StudentId
                             where studentsAndGroups.StudyGroupId = @groupId";
 
-                    сommand.Parameters.Add("@groupId", SqlDbType.NVarChar).Value = groupId;
+                    сommand.Parameters.Add( "@groupId", SqlDbType.NVarChar ).Value = groupId;
 
-                    res = Convert.ToInt32(сommand.ExecuteScalar());
+                    res = Convert.ToInt32( сommand.ExecuteScalar() );
                 }
             }
             return res;

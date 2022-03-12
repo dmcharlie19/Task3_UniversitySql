@@ -9,7 +9,7 @@ namespace UniversitySql.Repositories
     {
         protected readonly string _connectionString;
 
-        public CommonOperationsSqlRepository(string connectionString)
+        public CommonOperationsSqlRepository( string connectionString )
         {
             _connectionString = connectionString;
         }
@@ -18,24 +18,24 @@ namespace UniversitySql.Repositories
         {
             var result = new List<T>();
 
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
 
-                using (SqlCommand Command = connection.CreateCommand())
+                using ( SqlCommand Command = connection.CreateCommand() )
                 {
-                    Command.CommandText = $@"select * from {typeof(T).Name}";
-                    using (SqlDataReader reader = Command.ExecuteReader())
+                    Command.CommandText = $@"select * from {typeof( T ).Name}";
+                    using ( SqlDataReader reader = Command.ExecuteReader() )
                     {
-                        while (reader.Read())
+                        while ( reader.Read() )
                         {
-                            var properties = typeof(T).GetProperties();
+                            var properties = typeof( T ).GetProperties();
                             T obj = new T();
-                            foreach (var prop in properties)
+                            foreach ( var prop in properties )
                             {
-                                prop.SetValue(obj, reader[prop.Name]);
+                                prop.SetValue( obj, reader[ prop.Name ] );
                             }
-                            result.Add(obj);
+                            result.Add( obj );
                         }
                     }
 
@@ -44,31 +44,31 @@ namespace UniversitySql.Repositories
             return result;
         }
 
-        public T GetById(int id)
+        public T GetById( int id )
         {
-            T result = default(T);
+            T result = default( T );
 
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
 
-                using (SqlCommand сommand = connection.CreateCommand())
+                using ( SqlCommand сommand = connection.CreateCommand() )
                 {
                     сommand.CommandText =
-                        $@"select * from {typeof(T).Name}
+                        $@"select * from {typeof( T ).Name}
                             where [id] = @id";
 
-                    сommand.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                    сommand.Parameters.Add( "@id", SqlDbType.Int ).Value = id;
 
-                    using (SqlDataReader reader = сommand.ExecuteReader())
+                    using ( SqlDataReader reader = сommand.ExecuteReader() )
                     {
-                        if (reader.Read())
+                        if ( reader.Read() )
                         {
                             result = new T();
-                            var properties = typeof(T).GetProperties();
-                            foreach (var prop in properties)
+                            var properties = typeof( T ).GetProperties();
+                            foreach ( var prop in properties )
                             {
-                                prop.SetValue(result, reader[prop.Name]);
+                                prop.SetValue( result, reader[ prop.Name ] );
                             }
                         }
                     }
@@ -77,56 +77,56 @@ namespace UniversitySql.Repositories
             return result;
         }
 
-        public void Add(T obj)
+        public void Add( T obj )
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
-                using (SqlCommand сommand = connection.CreateCommand())
+                using ( SqlCommand сommand = connection.CreateCommand() )
                 {
-                    var properties = typeof(T).GetProperties();
+                    var properties = typeof( T ).GetProperties();
 
                     string values = "";
-                    for (int i = 0; i < properties.Length; i++)
+                    for ( int i = 0; i < properties.Length; i++ )
                     {
-                        if (properties[i].Name == "Id")
+                        if ( properties[ i ].Name == "Id" )
                             continue;
 
-                        values += $@"@{properties[i].Name}";
-                        if (i + 1 != properties.Length)
+                        values += $@"@{properties[ i ].Name}";
+                        if ( i + 1 != properties.Length )
                             values += ", ";
                     }
 
                     сommand.CommandText =
-                        $@"insert into [{typeof(T).Name}]
+                        $@"insert into [{typeof( T ).Name}]
                         values
                             ({values})";
 
-                    foreach (var prop in properties)
+                    foreach ( var prop in properties )
                     {
-                        if (prop.Name == "Id")
+                        if ( prop.Name == "Id" )
                             continue;
 
-                        сommand.Parameters.AddWithValue(prop.Name, prop.GetValue(obj));
+                        сommand.Parameters.AddWithValue( prop.Name, prop.GetValue( obj ) );
                     }
 
-                    properties[0].SetValue(obj, Convert.ToInt32(сommand.ExecuteScalar()));
+                    properties[ 0 ].SetValue( obj, Convert.ToInt32( сommand.ExecuteScalar() ) );
                 }
             }
         }
 
-        public void DeleteById(int id)
+        public void DeleteById( int id )
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using ( var connection = new SqlConnection( _connectionString ) )
             {
                 connection.Open();
-                using (SqlCommand command = connection.CreateCommand())
+                using ( SqlCommand command = connection.CreateCommand() )
                 {
                     command.CommandText =
-                         $@"delete from [{typeof(T).Name}]
+                         $@"delete from [{typeof( T ).Name}]
                             where [Id] = @id";
 
-                    command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                    command.Parameters.Add( "@id", SqlDbType.Int ).Value = id;
 
                     command.ExecuteNonQuery();
                 }

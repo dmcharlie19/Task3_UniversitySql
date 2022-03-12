@@ -1,55 +1,56 @@
-use University
+--Create table "Group"
+IF NOT EXISTS (SELECT TOP 1 1 FROM sys.tables WHERE [name] = 'Group')
+BEGIN
+	CREATE TABLE [Group](
+		[Id] INT IDENTITY(1,1) CONSTRAINT PK_Group PRIMARY KEY,
+		[Title] NVARCHAR(100)
+	)
+END
 
-create table StudyGroup(
-	Id int identity(1,1) constraint PK_StudyGroup primary key,
-	Title nvarchar(100)
-)
-
-insert into StudyGroup
+--Insert groups into "Group"
+INSERT INTO [Group]
 	(Title)
-values
-	('IVT-11'),
-	('PS-11'),
-	('BI-11')
+VALUES ('IVT-11')
+	,('PS-11')
+	,('BI-11')
 
-select * from StudyGroup
+--Select all groups
+SELECT * FROM [Group]
 
-create table Student(
-	Id int identity(1,1) constraint PK_Student primary key,
-	FirstName nvarchar(100),
-	LastName nvarchar(100)
-)
+--Create table "Group"
+IF NOT EXISTS (SELECT TOP 1 1 FROM sys.tables WHERE [name] = 'Student')
+BEGIN
+	CREATE TABLE Student(
+		Id INT NOT NULL IDENTITY(1,1) CONSTRAINT PK_Student PRIMARY KEY,
+		FirstName NVARCHAR(100) NOT NULL,
+		LastName NVARCHAR(100) NOT NULL
+	)
+END
 
-insert into Student
-values
-	('Егор', 'Смирнов'),
-	('Иван', 'Иванов'),
-	('Сидр', 'Сидоров'),
-	('Кузнец', 'Кузнецов')
+--Insert students into "Student"
+INSERT INTO Student
+	(FirstName, LastName)
+VALUES
+	(N'Alex', N'Alexov'),
+	(N'Den', N'Denov'),
+	(N'Oleg', N'Olegov'),
+	(N'Sergey', N'Sergeev')
 
-select * from Student
+--Select all students
+SELECT * FROM Student
 
-create table StudentsAndGroups(
-	Id int identity(1,1) constraint PK_StudentsAndGroups primary key,
-	StudentId int constraint FK_Student references Student(Id),
-	StudyGroupId int constraint FK_StudyGroup references StudyGroup(Id)
-)
-
-insert into StudentsAndGroups
-values
-	('1', '1'),
-	('2', '2'),
-	('3', '3'),
-	('6', '1')
-
-select * from StudentsAndGroups
-
---Получить всех студентов распеределнныых по группам
-select [FirstName], [LastName], [Title] from StudentsAndGroups as studentsAndGroups
-join Student as s on s.Id = studentsAndGroups.StudentId
-join StudyGroup as g on g.Id = studentsAndGroups.StudyGroupId
-
---Получить всех студентов по группам id группы
-select count(*) from StudentsAndGroups as studentsAndGroups
-join Student as s on s.Id = studentsAndGroups.StudentId
-where studentsAndGroups.StudyGroupId = 1
+--Create table "StudentGroup"
+IF NOT EXISTS (SELECT TOP 1 1 FROM sys.tables WHERE [name] = 'StudentGroup')
+BEGIN
+	CREATE TABLE StudentGroup(
+		StudentId INT NOT NULL,
+		GroupId INT NOT NULL,
+		CONSTRAINT PK_StudentGroup PRIMARY KEY(StudentId, GroupId),
+		CONSTRAINT FK_StudentGroup_Student FOREIGN KEY(StudentId)
+		REFERENCES Student(Id)
+		ON DELETE CASCADE,
+		CONSTRAINT FK_StudentGroup_Group FOREIGN KEY(GroupId)
+		REFERENCES [Group](Id)
+		ON DELETE CASCADE
+	)
+END
